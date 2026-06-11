@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitty Feeder Tracker 🐾</title>
+
+
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      // Ersetze "DEIN_PUBLIC_KEY" mit dem Key aus deinen EmailJS-Account-Einstellungen
+      emailjs.init("Ztxo_SR9FQ2rRv2lp");
+   })();
+</script>
+
+
+
+  <style>
+    /* 🌸 Cute Pink Theme & Mobile Styling */
+    body {
+      background-color: #ffe6ea;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      color: #ff4d88;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 25px;
+      padding: 25px;
+      box-shadow: 0 8px 15px rgba(255, 105, 180, 0.2);
+      width: 100%;
+      max-width: 350px; /* Perfect for phones */
+    }
+
+    h1 { font-size: 1.8em; margin-bottom: 5px; }
+    h3 { font-size: 1.1em; margin-bottom: 10px; color: #ff6699; }
+
+    .section {
+      background-color: #fff0f3;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 2px dashed #ffb3c6;
+    }
+
+    input, select {
+      width: 90%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #ffccdd;
+      outline: none;
+      font-size: 1em;
+      color: #ff4d88;
+      background-color: white;
+    }
+
+    button {
+      background-color: #ff85a2;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      font-size: 1.1em;
+      width: 100%;
+      margin: 8px 0;
+      box-shadow: 0 5px 0 #ff4d88;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    button:active {
+      transform: translateY(5px);
+      box-shadow: none;
+    }
+
+    button:disabled {
+      background-color: #e0e0e0;
+      box-shadow: none;
+      color: #999;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    .log {
+      font-size: 0.95em;
+      color: #cc0052;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Kitty Feeder 🐱🎀</h1>
+    <p style="margin-top: 0; font-size: 0.9em;">Keep the fluffballs happy!</p>
+
+    <div class="section">
+      <h3>📱 Notification Settings</h3>
+      <input type="text" id="contactInfo" placeholder="Enter Email or Phone #">
+    </div>
+
+    <div class="section">
+      <h3>👤 Who is feeding the cats?</h3>
+      <select id="userSelect">
+        <option value="🌸 Fluffy's Mom">🌸 Fluffy's Mom</option>
+        <option value="🎀 Fluffy's Dad">🎀 Fluffy's Dad</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h3>✅ Today's Tasks</h3>
+      <button id="morningBtn" onclick="completeTask('Morning Meal')">☀️ Morning Feeding</button>
+      <button id="eveningBtn" onclick="completeTask('Evening Meal')">🌙 Evening Feeding</button>
+    </div>
+
+    <div class="log" id="logArea">
+      <p>Waiting for the first meal... 🐾</p>
+    </div>
+  </div>
+
+  <script>
+ // Hier parkst du deine Base64-Bilder als kurze Variablen ganz unten
+const bildFluffysMom = "catfeed_img_try.jpg";
+const bildFluffysDad = "catfeed_img_try.jpg";
+
+function completeTask(taskName) {
+  const user = document.getElementById('userSelect').value;
+  const contact = document.getElementById('contactInfo').value;
+  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+  if(contact.trim() === "") {
+    alert("Oops! Bitte gib zuerst eine E-Mail-Adresse ein! 🐾");
+    return;
+  }
+
+  const message = `YAY! ${user} hat gerade das ${taskName} um ${time} erledigt! 😻`;
+
+  // Welches Bild soll genutzt werden?
+  let gewaehltesBild = user.includes("Mom") ? bildFluffysMom : bildFluffysDad;
+
+  // 1. EmailJS Daten vorbereiten
+  const templateParams = {
+    send_to: contact,         // An wen die E-Mail geht
+    message: message,         // Der Text für {{message}} im Template
+    user_avatar: gewaehltesBild // Das Bild für {{user_avatar}} im Template
+  };
+
+  // 2. E-Mail über EmailJS senden
+  emailjs.send('service_shg7z2k', 'template_bfe8qgj', templateParams)
+    .then(function(response) {
+       console.log('Erfolgreich gesendet!', response.status, response.text);
+       alert("Miau! Die Fütterungs-Mail wurde erfolgreich gesendet! 💌");
+    }, function(error) {
+       console.log('Fehler beim Senden...', error);
+       alert("Oh nein, da lief was schief beim Senden. Schau in die Konsole.");
+    });
+
+  // 3. UI auf der Website aktualisieren (Button deaktivieren)
+  document.getElementById('logArea').innerHTML = `<p>😸 ${message}</p>`;
+  if(taskName === 'Morning Meal') {
+    document.getElementById('morningBtn').disabled = true;
+    document.getElementById('morningBtn').innerText = "☀️ Morgen (Erledigt!)";
+  } else {
+    document.getElementById('eveningBtn').disabled = true;
+    document.getElementById('eveningBtn').innerText = "🌙 Abend (Erledigt!)";
+  }
+
+    }
+  </script>
+
+</body>
+</html>
