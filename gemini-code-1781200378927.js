@@ -1,4 +1,4 @@
-emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+emailjs.send("service_shg7z2k", "template_bfe8qgj", {
   send_to: contact,
   message: message
 });
