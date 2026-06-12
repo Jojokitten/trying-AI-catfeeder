@@ -5,22 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kitty Feeder Tracker 🐾</title>
 
-<!--iconic icon Comment-->
-<link rel="icon" type="image/png" sizes="256x256" href="icon_256.png">
-    <link rel="apple-touch-icon" href="icon_256.png">
-    
-    <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="256x256" href="icon_256.png">
+  <link rel="apple-touch-icon" href="icon_256.png">
+  <link rel="manifest" href="manifest.json">
 
-
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script type="text/javascript">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
    (function(){
-      // Ersetze "DEIN_PUBLIC_KEY" mit dem Key aus deinen EmailJS-Account-Einstellungen
       emailjs.init("Ztxo_SR9FQ2rRv2lp");
    })();
-</script>
-
-
+  </script>
 
   <style>
     /* 🌸 Cute Pink Theme & Mobile Styling */
@@ -41,7 +35,7 @@
       padding: 25px;
       box-shadow: 0 8px 15px rgba(255, 105, 180, 0.2);
       width: 100%;
-      max-width: 350px; /* Perfect for phones */
+      max-width: 350px;
     }
 
     h1 { font-size: 1.8em; margin-bottom: 5px; }
@@ -109,16 +103,16 @@
 
     <div class="section">
       <h3>📱 Notification Settings</h3>      
-      <select id="userSelect">
-        <option value="🌸 Fluffy's Mom">🌸 johanna.mauritz.i@gmail.com</option>
-        <option value="🎀 Fluffy's Dad">🎀 afriedreich@yahoo.de</option>
+      <select id="emailSelect">
+        <option value="johanna.mauritz.i@gmail.com">🌸 johanna.mauritz.i@gmail.com</option>
+        <option value="afriedreich@yahoo.de">🎀 afriedreich@yahoo.de</option>
       </select>
     </div>
 
     <div class="section">
       <h3>👤 Who is feeding the cats?</h3>
       <select id="userSelect">
-        <option value="🌸  Mom">🌸 Katzenmama</option>
+        <option value="🌸 Mom">🌸 Katzenmama</option>
         <option value="🎀 Fluffy's Dad">🎀 Katzenoma</option>
       </select>
     </div>
@@ -135,52 +129,47 @@
   </div>
 
   <script>
- // Hier parkst du deine Base64-Bilder als kurze Variablen ganz unten
-const bildFluffysMom = "catfeed_img_try.jpg";
-const bildFluffysDad = "catfeed_img_try.jpg";
+    // Bilder Platzhalter
+    const bildFluffysMom = "catfeed_img_try.jpg";
+    const bildFluffysDad = "catfeed_img_try.jpg";
 
-function completeTask(taskName) {
-  const user = document.getElementById('userSelect').value;
-  const contact = document.getElementById('contactInfo').value;
-  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    function completeTask(taskName) {
+      // 1. Hole die Werte aus den Dropdowns
+      const user = document.getElementById('userSelect').value;
+      const selectedEmail = document.getElementById('emailSelect').value;
+      
+      // 2. Zeitstempel erstellen
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-  if(contact.trim() === "") {
-    alert("Oops! Bitte gib zuerst eine E-Mail-Adresse ein! 🐾");
-    return;
-  }
+      // 3. E-Mail Text zusammenbauen
+      const messageText = `YAY! ${user} hat gerade das ${taskName} um ${time} erledigt! 😻`;
 
-  const message = `YAY! ${user} hat gerade das ${taskName} um ${time} erledigt! 😻`;
+      // 4. Erstelle das Objekt mit den Daten für EmailJS
+      var templateParams = {
+          message: messageText, // Schickt jetzt die genaue Uhrzeit und den Namen mit!
+          target_email: selectedEmail 
+      };
 
-  // Welches Bild soll genutzt werden?
-  let gewaehltesBild = user.includes("Mom") ? bildFluffysMom : bildFluffysDad;
+      // 5. Sende es an EmailJS
+      emailjs.send('service_shg7z2k', 'template_bfe8qgj', templateParams)
+          .then(function(response) {
+             console.log('Erfolgreich gesendet!', response.status, response.text);
+             // Du könntest hier auch ein alert("E-Mail wurde gesendet!") einbauen
+          }, function(error) {
+             console.log('Fehler beim Senden...', error);
+             alert("Oops! Die E-Mail konnte nicht gesendet werden.");
+          });
 
-  // 1. EmailJS Daten vorbereiten
-  const templateParams = {
-    send_to: contact,         // An wen die E-Mail geht
-    message: message,         // Der Text für {{message}} im Template
-    user_avatar: gewaehltesBild // Das Bild für {{user_avatar}} im Template
-  };
-
-  // 2. E-Mail über EmailJS senden
-  emailjs.send('service_shg7z2k', 'template_bfe8qgj', templateParams)
-    .then(function(response) {
-       console.log('Erfolgreich gesendet!', response.status, response.text);
-       alert("Miau! Die Fütterungs-Mail wurde erfolgreich gesendet! 💌");
-    }, function(error) {
-       console.log('Fehler beim Senden...', error);
-       alert("Oh nein, da lief was schief beim Senden. Schau in die Konsole.");
-    });
-
-  // 3. UI auf der Website aktualisieren (Button deaktivieren)
-  document.getElementById('logArea').innerHTML = `<p>😸 ${message}</p>`;
-  if(taskName === 'Morning Meal') {
-    document.getElementById('morningBtn').disabled = true;
-    document.getElementById('morningBtn').innerText = "☀️ Morgen (Erledigt!)";
-  } else {
-    document.getElementById('eveningBtn').disabled = true;
-    document.getElementById('eveningBtn').innerText = "🌙 Abend (Erledigt!)";
-  }
-
+      // 6. UI auf der Website aktualisieren (Button deaktivieren)
+      document.getElementById('logArea').innerHTML = `<p>😸 ${messageText}</p>`;
+      
+      if(taskName === 'Morning Meal') {
+        document.getElementById('morningBtn').disabled = true;
+        document.getElementById('morningBtn').innerText = "☀️ Morgen (Erledigt!)";
+      } else {
+        document.getElementById('eveningBtn').disabled = true;
+        document.getElementById('eveningBtn').innerText = "🌙 Abend (Erledigt!)";
+      }
     }
   </script>
 
